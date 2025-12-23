@@ -1,0 +1,3 @@
+consumer_timestamp,ingestion_timestamp,kafka_partition,kafka_offset,bridge_client_id,building_id,device_id,humidity,lm393_threshold,lm393_voltage,mqtt_topic,project_id,source,temperature,vendor
+2025-12-20T17:23:20.568796Z,2025-12-20T17:23:15.839377Z,0,20,mqtt-kafka-bridge-7a517d6b9a4d-1766251101,building-a-dhaka,ahu-01-controller,66.9,1,3.3,optiify-fdd-data-receive-test-cluster-01,optiify-project-01,mqtt-bridge-docker,24.5,siemens
+2025-12-20T17:23:25.548559Z,2025-12-20T17:23:25.533350Z,0,21,mqtt-kafka-bridge-7a517d6b9a4d-1766251101,building-a-dhaka,ahu-01-controller,66.6,1,3.3,optiify-fdd-data-receive-test-cluster-01,optiify-project-01,mqtt-bridge-docker,24.5,siemens

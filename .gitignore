@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# EC2 folder or files
+EC2/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/

@@ -1,34 +1,47 @@
 import json
 from kafka import KafkaConsumer
 
-# Kafka Configuration - UPDATED TO USE IP ADDRESS
-KAFKA_BROKER = "192.168.0.108:9092"
+# ================= CONFIGURATION =================
+KAFKA_BROKER = "172.31.20.9:9092"
 KAFKA_TOPIC = "sensor-data"
-GROUP_ID = "sensor-consumer-group"
+GROUP_ID = "sensor-consumer-simple"
 
-# Create consumer
+print("🚀 Simple Kafka Consumer - Shows ALL Fields")
+print(f"🌐 Broker: {KAFKA_BROKER} | Topic: {KAFKA_TOPIC}")
+print("=" * 70)
+
+# ================= CREATE CONSUMER =================
 consumer = KafkaConsumer(
     KAFKA_TOPIC,
     bootstrap_servers=KAFKA_BROKER,
     group_id=GROUP_ID,
     auto_offset_reset='earliest',
+    enable_auto_commit=True,
     value_deserializer=lambda m: json.loads(m.decode('utf-8'))
 )
 
-print(f"🎯 Listening to Kafka topic: {KAFKA_TOPIC}")
-print(f"🌐 Kafka Broker: {KAFKA_BROKER}")
-print("=" * 60)
+print("✅ Connected | Listening for any JSON format...\n")
 
-for message in consumer:
-    data = message.value
-    print(f"""
-📊 New Sensor Reading:
-   Timestamp: {data.get('timestamp')}
-   Temperature: {data.get('temperature')}°C
-   Humidity: {data.get('humidity')}%
-   Topic: {data.get('topic')}
-   Kafka Broker: {data.get('kafka_broker')}
-   Partition: {message.partition}
-   Offset: {message.offset}
-""")
-    print("=" * 60)
+# ================= CONSUME MESSAGES =================
+message_count = 0
+
+try:
+    for message in consumer:
+        message_count += 1
+        
+        print("=" * 70)
+        print(f"📊 Message #{message_count} | Partition: {message.partition} | Offset: {message.offset}")
+        print("=" * 70)
+        
+        # Pretty print ALL fields automatically
+        print(json.dumps(message.value, indent=2, ensure_ascii=False))
+        
+        print("=" * 70)
+        print()
+
+except KeyboardInterrupt:
+    print(f"\n🛑 Stopped | Total: {message_count} messages")
+except Exception as e:
+    print(f"❌ Error: {e}")
+finally:
+    consumer.close()

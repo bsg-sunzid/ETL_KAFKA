@@ -11,12 +11,18 @@ services:
       - "2181:2181"
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -27,21 +33,28 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   mqtt-kafka-bridge:
     build: ./mqtt-bridge
     container_name: mqtt-kafka-bridge
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     environment:
       MQTT_BROKER: "broker.mqttdashboard.com"
       MQTT_PORT: 1883
-      MQTT_TOPIC: "wokwi-weather"
+      MQTT_TOPIC: "optiify-fdd-data-receive-test-cluster-01"
       KAFKA_BROKER: "kafka:29092"
       KAFKA_TOPIC: "sensor-data"
-    restart: unless-stopped
+    restart: on-failure 
     networks:
       - kafka-network
 
@@ -53,7 +66,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_NAME: optiify-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     networks:
       - kafka-network
